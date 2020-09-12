@@ -4,6 +4,7 @@ from funcmodule import *
 steamwords = ['game', 'good', 'great', 'lot', 'youre', 'your'] # the list of steam words are being updated as time goes on
 removedwords = stopwords + steamwords    
 
+
 # filter the review text
 def filter_key_words(reviews):
     key_words = []
@@ -17,10 +18,11 @@ def filter_key_words(reviews):
 
 
 # set-up the initial url and payload
-url = 'http://store.steampowered.com/appreviews/393380?json=1?'
-payload = {'filter': 'recent', 'language': 'english', 'day_range': '1', 'review_type': 'all', 'purchase_type': 'all', 'num_per_page': '20'}
+appid = str(393380)
+url = 'http://store.steampowered.com/appreviews/'
+payload = {'filter': 'recent', 'language': 'english', 'day_range': '1', 'review_type': 'all', 'purchase_type': 'all', 'num_per_page': '100'}
 
-query = form_and_send_query(url, payload, "*")      # query Steam to get information about all reviews and users
+query = get_query_data(url, appid, payload)                # get query data, either locally or from Steam.
 
 review_list = list(query.get('reviews'))            # specify only review information
 

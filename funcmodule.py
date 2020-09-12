@@ -51,25 +51,65 @@ stopwords += ['within', 'without', 'would', 'yet', 'you', 'your']
 stopwords += ['yours', 'yourself', 'yourselves']
 
 import matplotlib.pyplot as plt
-import requests, re, string
+import requests, re, string, json, os.path
 from wordcloud import WordCloud
 
-def form_and_send_query(url, payload, cursor):
+def get_string_from_params(payload, appid):
+
+    # filter can be r (recent) u (updated) or a (all). 
+    # language is a minimum of 3 characters to store 'all'
+    p_filt_lan  = payload.get('filter')[0] + payload.get('language')[0:3]
+
+    p_curs = payload.get('cursor')   
+    if p_curs == '*':
+        p_curs = 'a'
+
+    # day_range and cursor (unless the cursor is asterisk "*") are directly from the payload
+    p_rnge_curs = payload.get('day_range') + p_curs
+
+    # review_type can be a (all) p (positive) or n (negative). 
+    # purchase_type can be a (all) n (non_steam_purchase) or s (steam)
+    # num_per_page is directly from the payload
+    p_types_num = payload.get('review_type')[0] +  payload.get('purchase_type')[0] +  payload.get('num_per_page') 
+
+
+    return p_filt_lan + p_rnge_curs + p_types_num + appid
+
+# use a local copy of the requested query if it exists.
+# otherwise, form the query, send it, and write the json response to a file.
+def get_query_data(url, appid, payload, cursor="*"):
     payload['cursor'] = cursor
 
-    r = requests.get(url, params=payload)
+    filename = get_string_from_params(payload, appid)
 
-    check_assertions(r.status_code, 'init_stat_code')
 
-    json_form = r.json()
+    if os.path.isfile(filename) is True:    # the file exists, so use the local query data instead.
+        print("the local query " + filename + " exists!")
+        f = open(filename, 'r')
+        json_form = json.load(f)
+        f.close()
+        
+    else:                                   # otherwise, query Steam and write that data locally.
+        print("the local query " + filename + " does NOT exist!")
+        full_url = url + appid + '?json=1?'
 
-    check_assertions(json_form.get('success'), 'query_success')
+        # send the request to Steam, check its response, and write the data to a file.
+        r = requests.get(full_url, params=payload) 
 
-    # IMPORTANT! MAKE SURE TO STOP GETTING REQ'S FOR THIS URL
-    requests.get(url, timeout=1)
+        check_assertions(r.status_code, 'init_stat_code')
+
+        json_form = r.json()
+
+        check_assertions(json_form.get('success'), 'query_success')
+        
+        f = open(filename, 'w')
+        json.dump(json_form, f)
+        f.close()
+
+        # IMPORTANT! MAKE SURE TO STOP GETTING REQ'S FOR THIS URL
+        requests.get(full_url, timeout=1)
 
     print_query_response_info(json_form)
-
     return json_form
 
 # get and print basic info for debugging
@@ -80,8 +120,6 @@ def print_query_response_info(json_form):
 
     print(cursor_ret)
     print(summary_ret) 
-
-    return json_form
 
 def createWordCloud(text):
     # Generate a word cloud image
