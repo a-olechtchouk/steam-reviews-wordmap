@@ -106,9 +106,6 @@ def get_query_data(url, appid, payload, cursor="*"):
         json.dump(json_form, f)
         f.close()
 
-        # IMPORTANT! MAKE SURE TO STOP GETTING REQ'S FOR THIS URL
-        requests.get(full_url, timeout=1)
-
     print_query_response_info(json_form)
     return json_form
 
@@ -154,13 +151,3 @@ def print_simple_review(review):
 
     print('Total hours played: ' + str(total_hours))
     print('Full review: ' + str(rev_text))
-
-def write_reviews_to_file(filename, all_reviews):
-
-    f = open(filename, 'w')
-
-    for x in all_reviews:
-        rev_text = x.get('review')
-        f.write(rev_text)
-
-    f.close()
