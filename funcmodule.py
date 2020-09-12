@@ -92,8 +92,8 @@ def createWordCloud(text):
     plt.axis("off")
     plt.show()
 
-def removeStopwords(wordlist, stopwords):
-    return [w for w in wordlist if w not in stopwords]
+def removeWords(wordlist, removedwords):
+    return [w for w in wordlist if w not in removedwords]
 
 
 def check_assertions(assertion_value, assertion_type):
