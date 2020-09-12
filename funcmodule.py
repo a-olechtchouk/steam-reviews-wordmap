@@ -87,9 +87,10 @@ def createWordCloud(text):
     # Generate a word cloud image
     wordcloud = WordCloud().generate(text)
 
-    # # Display the generated image the matplotlib way:
+    # Display the generated image the matplotlib way:
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
+    plt.savefig('wordmap.svg', dpi=600)
     plt.show()
 
 def removeWords(wordlist, removedwords):
