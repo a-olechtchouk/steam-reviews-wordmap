@@ -1,13 +1,7 @@
 import re, string
 from funcmodule import *
+import funcmodule as 
 from datetime import datetime
-
-steamwords = ['game', 'good', 'great', 'lot', 'youre', 'your', 'fun', 'play', 'dont', 'ive',
- 'really', 'thing', 'games', 'theres', 'shit', 'let' , 'enemie', 'im', 'fucking', 'didnt' , 'quite' , 'super' ,
- 'things' , 'alot' , 'isnt' , 'got' , 'ye' , 'stuff' , 'guy' , 'takes' , 'probably', 
- 'doesnt', 'boring', 'thats', 'youll' , 'wont' , 'man', 'tell' , 'used' , 'actually' , 'best' , 'better' , 'thats'
- , 'yes', 'no'] # the list of steam words are being updated as time goes on
-removedwords = stopwords + steamwords    
 
 def process_multiple_queries(url, appid, payload, iters):
 
@@ -18,18 +12,12 @@ def process_multiple_queries(url, appid, payload, iters):
     for x in range(iters):
 
         query = get_query_data(url, appid, payload)         # get query data, either locally or from Steam.\
-        # print(query)
+
         print(('query_summary is : ') + str(query.get('query_summary')))
+
         payload['cursor'] = query.get('cursor')
-        # print(query.get('cursor'))
 
-        if query.get("query_summary").get("num_reviews") == 0:
-            break
-
-        if query == -1:
-            break
-
-        if prev_cursor == query.get('cursor'):
+        if check_empty_query_response(query, prev_cursor):
             break
 
         review_list = list(query.get('reviews'))            # specify only review information
@@ -46,18 +34,9 @@ def process_multiple_queries(url, appid, payload, iters):
     print('processed a total of: ' + str(total_processed) + ' reviews.')
     return key_words
 
-# filter the review text
-def filter_key_words(reviews):
-    key_words = []
-    for x in reviews:
-        rev_text = x.get('review').lower()                                          # set the text to lowercase,
-        dt_object = datetime.fromtimestamp(x.get('timestamp_created'))
-        print("dt_object =", dt_object)
-        rev_text = rev_text.translate(str.maketrans('', '', string.punctuation))    # remove punctuation, 
-        rev_text = re.findall(r"(?i)\b[a-z]+\b", rev_text)                          # keep english alphabet characters,
-        rev_text = list(dict.fromkeys(rev_text))                                    # remove duplicate words,
-        key_words += removeWords(rev_text, removedwords)                            # remove specific words (common to Steam and stopwords)
-    return key_words
+
+
+
 
 
 # set-up the initial url and payload
