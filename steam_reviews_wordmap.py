@@ -2,7 +2,11 @@ import re, string
 from funcmodule import *
 from datetime import datetime
 
-steamwords = ['game', 'good', 'great', 'lot', 'youre', 'your', 'fun', 'play', 'dont', 'ive', 'really', 'thing', 'games', 'theres', 'shit'] # the list of steam words are being updated as time goes on
+steamwords = ['game', 'good', 'great', 'lot', 'youre', 'your', 'fun', 'play', 'dont', 'ive',
+ 'really', 'thing', 'games', 'theres', 'shit', 'let' , 'enemie', 'im', 'fucking', 'didnt' , 'quite' , 'super' ,
+ 'things' , 'alot' , 'isnt' , 'got' , 'ye' , 'stuff' , 'guy' , 'takes' , 'probably', 
+ 'doesnt', 'boring', 'thats', 'youll' , 'wont' , 'man', 'tell' , 'used' , 'actually' , 'best' , 'better' , 'thats'
+ , 'yes', 'no'] # the list of steam words are being updated as time goes on
 removedwords = stopwords + steamwords    
 
 def process_multiple_queries(url, appid, payload, iters):

@@ -105,21 +105,25 @@ def get_query_data(url, appid, payload):
 
 def createWordCloud(text):
 
-    squadmask = np.array(Image.open("squadlogo2.png"))
+    squadmask = np.array(Image.open("squadgradientbest10.png"))
 
     # Generate a word cloud image
-    wc = WordCloud(mask=squadmask, contour_width=3, contour_color='white', scale=3)
-    
+    wc = WordCloud(scale=1, stopwords=None, width=2560, height=1440,mask=squadmask, contour_width=4, contour_color='white')
+
     wc.generate(text)
 
     image_colors = ImageColorGenerator(squadmask)
 
+    # plt.figure(figsize=(25.60,14.40))
     plt.figure()
     plt.imshow(wc.recolor(color_func=image_colors), interpolation="bilinear")
     plt.axis("off")
-    # store to file
-    plt.savefig("wordcloud.png", format="png")
-    plt.show()
+    # plt.show()
+    plt.savefig('final_wordcloud.pdf')
+    wc.to_file('final_wordcloud.png')
+    wc.to_file('final_wordcloud.tiff')
+    wc.to_file('final_wordcloud.jpg')
+ 
 
 
 def removeWords(wordlist, removedwords):
