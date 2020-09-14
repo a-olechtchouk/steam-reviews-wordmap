@@ -102,31 +102,29 @@ def get_query_data(url, appid, payload):
 
     return json_form
 
+
 def createWordCloud(text):
 
-    squadmask = np.array(Image.open("squadlogo_black_gold_hires.png"))
-    
+    squadmask = np.array(Image.open("squadlogo2.png"))
+
     # Generate a word cloud image
-    wc = WordCloud(mask=squadmask, contour_width=3, contour_color='steelblue')
+    wc = WordCloud(mask=squadmask, contour_width=3, contour_color='white', scale=3)
     
     wc.generate(text)
 
-    # image_colors = ImageColorGenerator(mask)
     image_colors = ImageColorGenerator(squadmask)
 
-    # store to file
-    # wc.to_file("wordmap.png")
-
-    # show
-    plt.imshow(wc.recolor(color_func=image_colors), interpolation='bilinear')
-    # plt.axis("off")
-    # plt.figure()
-    plt.imshow(squadmask, cmap=plt.cm.get_cmap('gray'), interpolation='bilinear')
+    plt.figure()
+    plt.imshow(wc.recolor(color_func=image_colors), interpolation="bilinear")
     plt.axis("off")
+    # store to file
+    plt.savefig("wordcloud.png", format="png")
     plt.show()
+
 
 def removeWords(wordlist, removedwords):
     return [w for w in wordlist if w not in removedwords]
+
 
 def check_assertions(assertion_value, assertion_type):
 
