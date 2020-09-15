@@ -3,20 +3,21 @@ import errorchecking as err
 import inout
 import textprocessing as tp
 
+cwpath = os.getcwd() + '/'
+
 def get_string_from_params(payload, appid):
     p_curs = payload.get('cursor')   
     if p_curs == '*':
         p_curs = 'a'
     else:
         p_curs = re.sub('[/]', '', p_curs)
-
     return p_curs
 
 # use a local copy of the requested query if it exists.
 # otherwise, form the query, send it, and write the json response to a file.
 def get_query_data(url, appid, payload):
 
-    filename = get_string_from_params(payload, appid)
+    filename = cwpath + 'testcache/' + get_string_from_params(payload, appid)
 
     if os.path.isfile(filename):                    # the file exists, so load local query data
         print("the local query " + filename + " exists!")
@@ -93,20 +94,21 @@ filtered_review_words = process_multiple_queries(url, appid, payload, num_total_
 
 text = ' '.join(filtered_review_words)      # convert the list of filtered words into one long string
 
-inout.rw_txt('outputword.txt', 'w', text)   # save the final string of words to a textfile
+inout.rw_txt(cwpath + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
 
-produce_wordcloud(text, 'nicewordcloud',    # create and save an image of the new wordcloud
-'/home/andrew/steam-reviews-wordmap/usedimgs/squadgradientbest10.png')
+mask_img = 'squadgradientbest10.png'
+mask_path = cwpath + 'usedimgs/' + mask_img
+produce_wordcloud(text, cwpath + 'testreqs/' + 'nicewordcloud', mask_path)  # create and save an image of the new wordcloud
 
 # Create the wordcloud and save the image/s
-def produce_wordcloud(text, name, mask_img):
+def produce_wordcloud(text, name, mask_path):
     import matplotlib.pyplot as plt
     import numpy as np
     from wordcloud import WordCloud, ImageColorGenerator
     from PIL import Image
 
     # Init the wordcloud mask from an image
-    mask = np.array(Image.open(mask_img))
+    mask = np.array(Image.open(mask_path))
 
     # Generate a word cloud from text, and bound it inside the mask contour outline
     wc = WordCloud(scale=1, stopwords=None, width=2560, height=1440,mask=mask, contour_width=4, contour_color='white')
