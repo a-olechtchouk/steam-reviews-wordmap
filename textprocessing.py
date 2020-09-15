@@ -26,13 +26,6 @@ def filter_review(reviews):
 
     return filt_words
 
-
-# simple list to string conversion.  lst = filt_words
-def l_to_s(lst): return ' '.join(lst) 
-
-# simple string to list conversion (assuming each word has 1 space between.)  
-def s_to_l(text): return str(text).split(' ')
-
 # the list of basic stopwords that we dont care about
 stopwords = ['a', 'about', 'above', 'across', 'after', 'afterwards']
 stopwords += ['again', 'against', 'all', 'almost', 'alone', 'along']

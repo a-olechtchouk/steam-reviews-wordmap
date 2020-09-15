@@ -1,9 +1,9 @@
 import requests, os.path, re
 import errorchecking as err
 import inout
+import textprocessing as tp
 
 def get_string_from_params(payload, appid):
-
     p_curs = payload.get('cursor')   
     if p_curs == '*':
         p_curs = 'a'
@@ -41,65 +41,72 @@ def get_query_data(url, appid, payload):
 def process_multiple_queries(url, appid, payload, iters):
 
     total_processed = 0
-    key_words = []
+    filtered_review_words = []
     prev_cursor = ''
+    new_cursor = ''
 
     for x in range(iters):
 
         # get query GET response (json_dict) data, either locally or from Steam, and get its validity
         query = get_query_data(url, appid, payload)
 
-        # ensure that its valid, and that it differs from the previous query response.
-        # if not, break the loop and exit 
-        if (query is False) or (prev_cursor == query['cursor']):
+        if query is False:                  # ensure the new query response is valid
             break
-        
-        # the response is new and valid, so update the 'cursor' for the next payload (next GET request)
-        payload['cursor'] = query['cursor']
 
-        review_list = list(query.get('reviews'))            # specify only review information
-        key_words += filter_key_words(review_list)          # get a list of 'key' words by filtering out the words from each review text
+        new_cursor = query['cursor']
+        if prev_cursor == new_cursor:       # ensure the new query cursor differs from the previous
+            break
 
-        num_reviews = query.get('query_summary').get('num_reviews')
+                                            # the response is new and valid, so update the 'cursor' for:
+        payload['cursor'] = new_cursor      # - the next payload (next GET request)
+        prev_cursor = new_cursor            # - the previous cursor
+
+
+        review_list = list(query['reviews'])                        # get a list of reviews for this response
+        filtered_review_words += tp.filter_review(review_list)      # filter out the words from each review
+
+
+        # record how many reviews we recieved and add it to the total
+        query_summary = query['query_summary']
+
+        num_reviews = query_summary['num_reviews']
         total_processed = total_processed + num_reviews
-        prev_cursor = query.get('cursor')
-
+        
         print(('query_summary is : ') + str(query.get('query_summary')))
    
-
-
     print('processed a total of: ' + str(total_processed) + ' reviews.')
-    return key_words
+    return filtered_review_words
 
 
-# set-up the initial url and payload
+# set-up the appid, initial url, and payload
 appid = str(393380)
 url = 'http://store.steampowered.com/appreviews/'
-payload = {'filter': "recent", 'language': "english", 'cursor': "*", 'day_range': "3650", 'review_type': "all", 'purchase_type': "all", 'num_per_page': "100"}
+payload = {'filter': "recent", 'language': "english", 'cursor': "*",
+ 'day_range': "3650", 'review_type': "all", 'purchase_type': "all", 'num_per_page': "100"}
 
+# we can recieve up to 100 reviews per request.
+# since there are about 39,000 English reviews, we only need to send about 400 requests.
 num_total_requests = int(40000 / 100)
 
-key_words = process_multiple_queries(url, appid, payload, num_total_requests)
+# Process those 400 queries
+filtered_review_words = process_multiple_queries(url, appid, payload, num_total_requests)
 
-text = ' '.join(key_words)                          # finally convert the list of filtered words into one long string
+text = ' '.join(filtered_review_words)      # convert the list of filtered words into one long string
 
-# save the final string of words to a textfile
-f2 = open('output.txt', 'w')
-f2.write(text)
-f2.close()
+inout.rw_txt('outputword.txt', 'w', text)   # save the final string of words to a textfile
 
-createWordCloud(text)                               # create and display a wordcloud
-
+produce_wordcloud(text, 'nicewordcloud',    # create and save an image of the new wordcloud
+'/home/andrew/steam-reviews-wordmap/usedimgs/squadgradientbest10.png')
 
 # Create the wordcloud and save the image/s
-def produce_wordcloud(mask_img, text, name):
+def produce_wordcloud(text, name, mask_img):
     import matplotlib.pyplot as plt
     import numpy as np
     from wordcloud import WordCloud, ImageColorGenerator
     from PIL import Image
 
     # Init the wordcloud mask from an image
-    mask = np.array(Image.open(mask_img + ".png"))
+    mask = np.array(Image.open(mask_img))
 
     # Generate a word cloud from text, and bound it inside the mask contour outline
     wc = WordCloud(scale=1, stopwords=None, width=2560, height=1440,mask=mask, contour_width=4, contour_color='white')
@@ -118,33 +125,3 @@ def produce_wordcloud(mask_img, text, name):
     wc.to_file(name + '.png')
     wc.to_file(name + '.tiff')
     wc.to_file(name + '.jpg')
-
-
-
-
-
-
-
-
-
-            # f = open(filename, 'r')
-        # json_form = json.load(f)
-        # f.close()
-
-
-                # f = open(filename, 'w')
-        # json.dump(json_form, f)
-        # f.close()
-
-
-        # import matplotlib.pyplot as plt
-# import numpy as np
-# import requests, re, string, json, os.path
-# from wordcloud import WordCloud, ImageColorGenerator
-# from PIL import Image
-
-
-
-    # IMPORTANT! MAKE SURE TO STOP GETTING REQ'S FOR THIS URL
-    # full_url = url + appid + '?json=1?'
-    # requests.get(full_url, timeout=0.001)
