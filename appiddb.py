@@ -14,11 +14,9 @@ def check_valid_user_input(appid, name):
     assert((appid != None) or (name != None)), 'The appid and name was empty!'
 
 def get_tuples_from_games(gamesdict: dict):
-    
     gamelist = list(gamesdict.get('applist').get('apps'))
 
     tuple_list = []
-
     for game in gamelist:
         title = game['name']
         appid = int(game['appid'])
@@ -26,27 +24,25 @@ def get_tuples_from_games(gamesdict: dict):
         cur_tuple = (title, appid)
         tuple_list.append(cur_tuple)
 
-    print('There are' , len(tuple_list), 'applications/games in the database.')
-    sorted_tuple_list = sorted(tuple_list, key=itemgetter(0))
-
+    sorted_tuple_list = sorted(tuple_list, key=itemgetter(0))   # sort the list alphabetically (based on title)
+    print('There are' , len(sorted_tuple_list), 'applications/games in the database.')
     return sorted_tuple_list
 
-def build_trie_from_games(gamesdict: dict):
+def search_trie(root: trie.Node, prefix: str):
+    return
 
-    gamelist = list(gamesdict.get('applist').get('apps'))
-    print(gamelist[5])
+def build_trie_from_games(games: list):
 
-    sorted_gamelist = sorted(gamelist, key=attrgetter('name'))
-    print(sorted_gamelist[5])
+    root_trie = trie.Node()
+
+    for game in games:
+        game = tuple(game)
+        trie.insert(root_trie, game[0], game[1])
     
 
-    # parent trie
-    # root_trie = trie.Node()
-    # for game in gamelist:
-
-    #     trie.insert
-
-    # return root_trie
+    search_results = trie.keys_with_prefix(root_trie, 'Squa')
+    print(search_results)
+    return search_results
 
 
 def get_id_and_name(appid=None, name=None):
@@ -59,30 +55,27 @@ def get_id_and_name(appid=None, name=None):
         print('Please enter a valid appid OR name!')
         check_valid_user_input(appid, name)
 
-# get the dictionary of all {appid, name} pairings for apps from Steam.
-# if the local query response exists load it, otherwise send 1 request to Steam and store it.
+# Send a GET request to Steam if the game database doesn't exist
 def get_gameslist(url, filename):
 
     filename += 'steamgamelistraw'
 
-    if os.path.isfile(filename):                    # the file exists, so load local query data
+    if os.path.isfile(filename):                        # the file exists, so load local query data
         print("the local query " + filename + " exists!")
         json_dict = inout.rw_json(filename, 'r') 
 
-    else:                                           # its not cached locally, so query Steam
+    else:                                               # its not cached locally, so query Steam
         print("the local query " + filename + " does NOT exist!")
 
-        r = requests.get(urldb, timeout=(3.05, 27))  # send a GET request,
+        r = requests.get(urldb, timeout=(3.05, 27))     # send a GET request,
 
-        if r.status_code != 200: return False            # ensure response status code is 200 
-        if r.text == '{"response":{}}': return False     # ensure the (JSON-encoded) response list isnt empty
+        if r.status_code != 200: return False           # ensure response status code is 200 
+        if r.text == '{"response":{}}': return False    # ensure the (JSON-encoded) response list isnt empty
 
-        # print(r.text)
+        print(r.text)
 
         # validate the response we got
         json_dict = r.json()  
-
-        # print(json_dict)
 
         # it was valid, so write the query to a file locally
         inout.rw_json(filename, 'w', json_dict=json_dict)   
@@ -90,24 +83,14 @@ def get_gameslist(url, filename):
 
 
 urldb = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
-
-# query_json = query(url=urldb)
 cwpath = os.getcwd() + '/'
 filename = cwpath + 'appiddump/'
+
+# get the dictionary containing all Steam {appid, name} application pairings
 json_dict = get_gameslist(urldb, filename)
 
+# get the list of tuples (name, appid) for all Steam applications (sorted alphabetically by name)
 sorted_games_tuple_list = get_tuples_from_games(json_dict)
-# build_trie_from_games(json_dict)
 
-# get_id_and_name(appid=None, name='g')
-
-
-
-
-        # if appid: return game[appid]
-        # if name: return game[name]
-
-        # if game['name'] == 'Squad': print(game)
-
-
-    # next(item for item in dicts if item["name"] == "Pam")
+# build a Trie data structure from the sorted tuples that allows searchable prefixes
+trie_ds = build_trie_from_games(sorted_games_tuple_list)

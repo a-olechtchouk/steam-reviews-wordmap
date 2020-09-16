@@ -1,5 +1,5 @@
 # NOTE: NONE OF THE FOLLOWING CODE BELOW IS MINE. I DID NOT WRITE 1 LINE OF IT.
-# IT IS TAKEN FROM THE WIKI PAGE: https://en.wikipedia.org/wiki/Trie#A_Python_version
+# NOTE: IT IS TAKEN FROM THE WIKI PAGE: https://en.wikipedia.org/wiki/Trie#A_Python_version
 
 from typing import Optional, Dict, Any, List
 
@@ -9,7 +9,9 @@ class Node:
         # would not by default lexicographically sort the children, which is
         # required by the lexicographic sorting in the Sorting section.
         # For lexicographic sorting, we can instead use an array of Nodes.
-        self.children: Dict[str, Node] = {}  # mapping from character to Node
+        # self.children: Dict[str, Node] = {}  # mapping from character to Node
+        self.children: Dict[str, Optional[Node]] = {}  # mapping from character to Node
+        # self.children: Optional[Node] = []  # mapping from character to Node
         self.value: Optional[Any] = None
 
 def find(node: Node, key: str) -> Optional[Any]:
