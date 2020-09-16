@@ -36,3 +36,4 @@ database = trie.get_game_database(filename)     # fetch or load the local Steam 
 
 # search the Trie by application title, and return its appid.
 search_results = trie.search_trie(database, 'Squad')
+print(search_results)
