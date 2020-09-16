@@ -1,48 +1,7 @@
-import requests, os.path, re
-import errorchecking as err
-import inout
-import textprocessing as tp
-
-cwpath = os.getcwd() + '/'
-
-def get_string_from_params(payload, appid):
-    p_curs = payload.get('cursor')   
-    if p_curs == '*':
-        p_curs = 'a'
-    else:
-        p_curs = re.sub('[/]', '', p_curs)
-    return p_curs
-
-# TODO: will add functionality to query game name searches, after which 
-#       i could get the appid and do a search for the title something like that...
-#       and there'd be a better way to save the files... per game... modularity
-#       
-
-# use a local copy of the requested query if it exists.
-# otherwise, form the query, send it, and write the json response to a file.
-def get_check_query(url, appid, payload):
-
-    filename = cwpath + 'testcache/' + get_string_from_params(payload, appid)
-
-    if os.path.isfile(filename):                    # the file exists, so load local query data
-        print("the local query " + filename + " exists!")
-        json_dict = inout.rw_json(filename, 'r') 
- 
-    else:                                           # its not cached locally, so query Steam
-        print("the local query " + filename + " does NOT exist!")
-
-        full_url = url + appid + '?json=1?'         # form the complete URL,
-        r = requests.get(full_url, params=payload, timeout=(3.05, 27))  # send a GET request,
-
-        # validate the response we got
-        json_dict = err.is_query_response_valid(r)
-        if json_dict is False: return False
-
-        # it was valid, so write the query to a file locally
-        inout.rw_json(filename, 'w', json_dict=json_dict)   
-    
-    return json_dict
-
+from textprocessing import filter_review
+from os import getcwd
+from handlerequests import get_check_query
+from inout import rw_txt
 
 def process_multiple_queries(url, appid, payload, iters):
 
@@ -69,8 +28,7 @@ def process_multiple_queries(url, appid, payload, iters):
 
 
         review_list = list(query['reviews'])                        # get a list of reviews for this response
-        filtered_review_words += tp.filter_review(review_list)      # filter out the words from each review
-
+        filtered_review_words += filter_review(review_list)      # filter out the words from each review
 
         # record how many reviews we recieved and add it to the total
         query_summary = query['query_summary']
@@ -127,7 +85,8 @@ filtered_review_words = process_multiple_queries(url, appid, payload, num_total_
 
 text = ' '.join(filtered_review_words)      # convert the list of filtered words into one long string
 
-inout.rw_txt(cwpath + 'testcache/' + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
+cwpath = getcwd() + '/'
+rw_txt(cwpath + 'testcache/' + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
 
 mask_img = 'squadgradientbest10.png'
 mask_path = cwpath + 'usedimgs/' + mask_img

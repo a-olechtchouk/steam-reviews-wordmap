@@ -1,4 +1,5 @@
-import re, string
+from string import punctuation
+from re import findall, sub
 from datetime import datetime
 
 # filter the text from a batch (a list) of 1-100 different reviews made by users
@@ -13,9 +14,9 @@ def filter_review(reviews):
 
         txt = x.get('review').lower()                                  # set the text to lowercase
 
-        txt = txt.translate(str.maketrans('', '', string.punctuation)) # remove punctuation
+        txt = txt.translate(str.maketrans('', '', punctuation)) # remove punctuation
 
-        txt = re.findall(r"(?i)\b[a-z]+\b", txt)                       # keep english alphabet characters
+        txt = findall(r"(?i)\b[a-z]+\b", txt)                       # keep english alphabet characters
 
         txt = list(dict.fromkeys(txt))                                 # remove duplicate words
 
@@ -25,6 +26,14 @@ def filter_review(reviews):
         print("dt_object =", dt_object)
 
     return filt_words
+
+def get_string_from_params(payload, appid):
+    p_curs = payload.get('cursor')   
+    if p_curs == '*':
+        p_curs = 'a'
+    else:
+        p_curs = sub('[/]', '', p_curs)
+    return p_curs
 
 # the list of basic stopwords that we dont care about
 stopwords = ['a', 'about', 'above', 'across', 'after', 'afterwards']

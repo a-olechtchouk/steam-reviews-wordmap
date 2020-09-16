@@ -1,4 +1,3 @@
-import requests
 from requests import Response
 import simplejson as json
 
