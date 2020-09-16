@@ -82,33 +82,7 @@ def _get_node(node: Node, key: str) -> Optional[Node]:
 
 # NOTE: ~~~~~~~~~~~~~~~~~ START OF MY OWN FUNCTIONS THAT I WROTE ~~~~~~~~~~~~~~~~~
 
-def get_game_database(filename) -> Node:
-    from os.path import isfile
-    from inout import rw_trie
-    from handlerequests import get_gameslist
-    from appiddb import get_tuples_from_games
-
-    urldb = 'http://api.steampowered.com/ISteamApps/GetAppList/v0002/'
-    db_filename = filename + 'Steam_game_db'
-
-    if isfile(db_filename):                            # the database exists, so load the local copy
-        print("the local database " + db_filename + " exists!")
-        root_trie = rw_trie(db_filename, 'r')
-    else:
-        print("the local database " + db_filename + " DOES NOT exist!")
-
-        # get the dictionary containing all Steam {appid, name} application pairings
-        json_dict = get_gameslist(urldb, filename)
-
-        # get the list of tuples (name, appid) for all Steam applications (sorted alphabetically by name)
-        sorted_games_tuple_list = get_tuples_from_games(json_dict)
-
-        # build a Trie data structure from the sorted tuples that allows searchable prefixes
-        root_trie = build_trie_from_games(sorted_games_tuple_list)
-        rw_trie(db_filename, 'w', root_trie)
-    return root_trie
-
-    # build the Trie using a sorted list of Steam application tuples (name, appid)
+# build the Trie using a sorted list of Steam application tuples (name, appid)
 def build_trie_from_games(games: list):
     root_trie = Node()
     for game in games:
