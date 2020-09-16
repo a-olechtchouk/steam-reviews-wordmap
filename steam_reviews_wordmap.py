@@ -13,9 +13,14 @@ def get_string_from_params(payload, appid):
         p_curs = re.sub('[/]', '', p_curs)
     return p_curs
 
+# TODO: will add functionality to query game name searches, after which 
+#       i could get the appid and do a search for the title something like that...
+#       and there'd be a better way to save the files... per game... modularity
+#       
+
 # use a local copy of the requested query if it exists.
 # otherwise, form the query, send it, and write the json response to a file.
-def get_query_data(url, appid, payload):
+def get_check_query(url, appid, payload):
 
     filename = cwpath + 'testcache/' + get_string_from_params(payload, appid)
 
@@ -27,7 +32,7 @@ def get_query_data(url, appid, payload):
         print("the local query " + filename + " does NOT exist!")
 
         full_url = url + appid + '?json=1?'         # form the complete URL,
-        r = requests.get(full_url, params=payload)  # send a GET request,
+        r = requests.get(full_url, params=payload, timeout=(3.05, 27))  # send a GET request,
 
         # validate the response we got
         json_dict = err.is_query_response_valid(r)
@@ -49,7 +54,7 @@ def process_multiple_queries(url, appid, payload, iters):
     for x in range(iters):
 
         # get query GET response (json_dict) data, either locally or from Steam, and get its validity
-        query = get_query_data(url, appid, payload)
+        query = get_check_query(url, appid, payload)
 
         if query is False:                  # ensure the new query response is valid
             break
@@ -78,28 +83,6 @@ def process_multiple_queries(url, appid, payload, iters):
     print('processed a total of: ' + str(total_processed) + ' reviews.')
     return filtered_review_words
 
-
-# set-up the appid, initial url, and payload
-appid = str(393380)
-url = 'http://store.steampowered.com/appreviews/'
-payload = {'filter': "recent", 'language': "english", 'cursor': "*",
- 'day_range': "3650", 'review_type': "all", 'purchase_type': "all", 'num_per_page': "100"}
-
-# we can recieve up to 100 reviews per request.
-# since there are about 39,000 English reviews, we only need to send about 400 requests.
-num_total_requests = int(40000 / 100)
-
-# Process those 400 queries
-filtered_review_words = process_multiple_queries(url, appid, payload, num_total_requests)
-
-text = ' '.join(filtered_review_words)      # convert the list of filtered words into one long string
-
-inout.rw_txt(cwpath + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
-
-mask_img = 'squadgradientbest10.png'
-mask_path = cwpath + 'usedimgs/' + mask_img
-produce_wordcloud(text, cwpath + 'testreqs/' + 'nicewordcloud', mask_path)  # create and save an image of the new wordcloud
-
 # Create the wordcloud and save the image/s
 def produce_wordcloud(text, name, mask_path):
     import matplotlib.pyplot as plt
@@ -127,3 +110,25 @@ def produce_wordcloud(text, name, mask_path):
     wc.to_file(name + '.png')
     wc.to_file(name + '.tiff')
     wc.to_file(name + '.jpg')
+
+
+# set-up the appid, initial url, and payload
+appid = str(393380)
+url = 'http://store.steampowered.com/appreviews/'
+payload = {'filter': "recent", 'language': "english", 'cursor': "*",
+ 'day_range': "3650", 'review_type': "all", 'purchase_type': "all", 'num_per_page': "100"}
+
+# we can recieve up to 100 reviews per request.
+# since there are about 39,000 English reviews, we only need to send about 400 requests.
+num_total_requests = int(40000 / 100)
+
+# Process those 400 queries
+filtered_review_words = process_multiple_queries(url, appid, payload, num_total_requests)
+
+text = ' '.join(filtered_review_words)      # convert the list of filtered words into one long string
+
+inout.rw_txt(cwpath + 'testcache/' + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
+
+mask_img = 'squadgradientbest10.png'
+mask_path = cwpath + 'usedimgs/' + mask_img
+produce_wordcloud(text, cwpath + 'testreqs/' + 'nicewordcloud', mask_path)  # create and save an image of the new wordcloud
