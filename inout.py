@@ -19,8 +19,11 @@ def rw_txt(name, mode, text=None):
 #  read and write Trie objects
 def rw_trie(name, mode, trie_obj=None):
     from pickle import load, dump
+    from sys import setrecursionlimit
+
+    setrecursionlimit(3000)
     
-    f = open(name, mode)
+    f = open(name, mode + 'b')
     if mode == 'r': trie_obj = load(f)
     if mode == 'w': dump(trie_obj, f)
     f.close()

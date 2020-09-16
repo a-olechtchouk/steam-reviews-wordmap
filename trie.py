@@ -109,7 +109,7 @@ def get_game_database(filename) -> Node:
     return root_trie
 
     # build the Trie using a sorted list of Steam application tuples (name, appid)
-def build_trie_from_games(games: list):
+def build_trie_from_games(games: list) -> Node:
     root_trie = Node()
     for game in games:
         game = tuple(game)
@@ -117,7 +117,5 @@ def build_trie_from_games(games: list):
     return root_trie
 
 def search_trie(root: Node, prefix: str):
-
     search_results = keys_with_prefix(root, prefix)
-    print(search_results)
     return search_results
