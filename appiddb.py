@@ -5,7 +5,7 @@ from handlerequests import get_gameslist
 from sys import setrecursionlimit
 import pickle, trie
 
-def check_valid_user_input(appid, name):
+def check_valid_user_input(appid=None, name):
     assert((appid != None) or (name != None)), 'The appid and name was empty!'
     
 def get_id_and_name(appid=None, name=None):
