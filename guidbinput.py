@@ -7,15 +7,16 @@ from appiddb import main
 
 sg.theme('DarkAmber')
 
-statustext = sg.Text(key='-OUTPUT-', text='Enter Steam game/app..', text_color='white', size=(50, 2))
-outputtext = sg.Text('', size=(50, 2), visible=False, key='-OUTPUT2-')
-
+statustext = sg.Text(key='-OUTPUT-', text='Enter Steam game/app..', text_color='white', size=(50, 2), font=('', 30))
+outputtext = sg.Text('', size=(50, 2), visible=False, key='-OUTPUT1-', font=('', 30))
+outputtext2 = sg.Text('', size=(50, 2), visible=False, key='-OUTPUT2-', font=('', 30))
+outputtext3 = sg.Text('', size=(50, 1), visible=False, key='-OUTPUT3-', font=('', 30))
 layout =    \
     [
-        [sg.Text('Status:', size=(8, 2)), statustext],
+        [sg.Text('Status:', font=('', 30), size=(8, 2)), statustext],
         [sg.Input(key='-IN-')],
         [sg.Button('Show', auto_size_button=True), sg.Button('Exit', auto_size_button=True)],
-        [outputtext]
+        [outputtext, outputtext2, outputtext3]
     ]
 
 window = sg.Window('Steam appid sample GUI', layout, size=(1600, 800), auto_size_text=True, auto_size_buttons=True)
@@ -44,11 +45,15 @@ while True:  # Event Loop
                 window['-OUTPUT-'].update(statustext.update(value=status_raw, text_color='red'))
             else:
                 status_raw = 'Ready!'
-                window['-OUTPUT-'].update(statustext.update(value=status_raw, text_color='green'))
+                window['-OUTPUT-'].update(statustext.update(value=status_raw, text_color='lime'))
 
                 first_result = search_results[0]
-                title_raw = 'This was the first result: ' + first_result + '\nIs this correct?'
-                window['-OUTPUT2-'].update(outputtext.update(value=title_raw, text_color='cyan', visible=True))
+                result = 'This was the first result:\n'
+                result2 = first_result + '\n'
+                result3 = 'Is this correct?'
+                window['-OUTPUT1-'].update(outputtext.update(value=result, text_color='pink', visible=True))
+                window['-OUTPUT2-'].update(outputtext2.update(value=result2, text_color='cyan', visible=True))
+                window['-OUTPUT3-'].update(outputtext3.update(value=result3, text_color='pink', visible=True))
 
 window.close()
 
