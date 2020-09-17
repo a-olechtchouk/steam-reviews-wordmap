@@ -2,7 +2,7 @@
 
 
 import PySimpleGUI as sg
-from trie import search_trie
+from trie import search_trie, find
 from appiddb import main
 
 sg.theme('DarkAmber')
@@ -10,13 +10,15 @@ sg.theme('DarkAmber')
 statustext = sg.Text(key='-OUTPUT-', text='Enter Steam game/app..', text_color='white', size=(50, 2), font=('', 30))
 outputtext = sg.Text('', size=(50, 2), visible=False, key='-OUTPUT1-', font=('', 30))
 outputtext2 = sg.Text('', size=(50, 2), visible=False, key='-OUTPUT2-', font=('', 30))
-outputtext3 = sg.Text('', size=(50, 1), visible=False, key='-OUTPUT3-', font=('', 30))
+outputtext3 = sg.Text('', size=(50, 2), visible=False, key='-OUTPUT3-', font=('', 30))
+outputtext4 = sg.Text('', size=(50, 2), visible=False, key='-OUTPUT4-', font=('', 30))
+outputtext5 = sg.Text('', size=(50, 2), visible=False, key='-OUTPUT5-', font=('', 30))
 layout =    \
     [
         [sg.Text('Status:', font=('', 30), size=(8, 2)), statustext],
         [sg.Input(key='-IN-')],
         [sg.Button('Show', auto_size_button=True), sg.Button('Exit', auto_size_button=True)],
-        [outputtext, outputtext2, outputtext3]
+        [outputtext, outputtext2, outputtext3, outputtext4, outputtext5]
     ]
 
 window = sg.Window('Steam appid sample GUI', layout, size=(1600, 800), auto_size_text=True, auto_size_buttons=True)
@@ -50,10 +52,14 @@ while True:  # Event Loop
                 first_result = search_results[0]
                 result = 'This was the first result:\n'
                 result2 = first_result + '\n'
-                result3 = 'Is this correct?'
+                result3 = 'It has appid:\n'
+                result4 = str(find(root_trie, first_result)) + '\n'
+                result5 = 'Is this correct?'
                 window['-OUTPUT1-'].update(outputtext.update(value=result, text_color='pink', visible=True))
                 window['-OUTPUT2-'].update(outputtext2.update(value=result2, text_color='cyan', visible=True))
                 window['-OUTPUT3-'].update(outputtext3.update(value=result3, text_color='pink', visible=True))
+                window['-OUTPUT4-'].update(outputtext4.update(value=result4, text_color='cyan', visible=True))
+                window['-OUTPUT5-'].update(outputtext5.update(value=result5, text_color='pink', visible=True))
 
 window.close()
 
