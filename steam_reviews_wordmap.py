@@ -87,8 +87,8 @@ def main_func(appid):
     text = ' '.join(filtered_review_words)      # convert the list of filtered words into one long string
 
     cwpath = getcwd() + '/'
-    rw_txt(cwpath + 'GUI_TEST_CACHE/' + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
+    rw_txt(cwpath + 'GUI_CACHE_TEST/' + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
 
     mask_img = 'squadgradientbest10.png'
     mask_path = cwpath + 'usedimgs/' + mask_img
-    produce_wordcloud(text, cwpath + 'GUI_IMG_CACHE/' + 'nicewordcloud', mask_path)  # create and save an image of the new wordcloud
+    produce_wordcloud(text, cwpath + 'GUI_IMG_TEST/' + 'nicewordcloud', mask_path)  # create and save an image of the new wordcloud
