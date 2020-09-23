@@ -14,7 +14,7 @@ import requests
 
 def get_check_query(url, appid, payload):
     cwpath = getcwd() + '/'
-    filename = cwpath + 'testcache/' + get_string_from_params(payload, appid)
+    filename = cwpath + 'GUI_CACHE_TEST/' + get_string_from_params(payload, appid)
 
     if isfile(filename):                    # the file exists, so load local query data
         print("the local query " + filename + " exists!")

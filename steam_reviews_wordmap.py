@@ -69,25 +69,26 @@ def produce_wordcloud(text, name, mask_path):
     wc.to_file(name + '.tiff')
     wc.to_file(name + '.jpg')
 
+def main_func(appid):
 
-# set-up the appid, initial url, and payload
-appid = str(393380)
-url = 'http://store.steampowered.com/appreviews/'
-payload = {'filter': "recent", 'language': "english", 'cursor': "*",
- 'day_range': "3650", 'review_type': "all", 'purchase_type': "all", 'num_per_page': "100"}
+    # set-up the appid, initial url, and payload
+    appid = str(appid) #393380
+    url = 'http://store.steampowered.com/appreviews/'
+    payload = {'filter': "recent", 'language': "english", 'cursor': "*",
+    'day_range': "3650", 'review_type': "all", 'purchase_type': "all", 'num_per_page': "100"}
 
-# we can recieve up to 100 reviews per request.
-# since there are about 39,000 English reviews, we only need to send about 400 requests.
-num_total_requests = int(40000 / 100)
+    # we can recieve up to 100 reviews per request.
+    # since there are about 39,000 English reviews, we only need to send about 400 requests.
+    num_total_requests = int(40000 / 100)
 
-# Process those 400 queries
-filtered_review_words = process_multiple_queries(url, appid, payload, num_total_requests)
+    # Process those 400 queries
+    filtered_review_words = process_multiple_queries(url, appid, payload, num_total_requests)
 
-text = ' '.join(filtered_review_words)      # convert the list of filtered words into one long string
+    text = ' '.join(filtered_review_words)      # convert the list of filtered words into one long string
 
-cwpath = getcwd() + '/'
-rw_txt(cwpath + 'testcache/' + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
+    cwpath = getcwd() + '/'
+    rw_txt(cwpath + 'GUI_TEST_CACHE/' + 'outputword.txt', 'w', text)   # save the final string of words to a textfile
 
-mask_img = 'squadgradientbest10.png'
-mask_path = cwpath + 'usedimgs/' + mask_img
-produce_wordcloud(text, cwpath + 'testreqs/' + 'nicewordcloud', mask_path)  # create and save an image of the new wordcloud
+    mask_img = 'squadgradientbest10.png'
+    mask_path = cwpath + 'usedimgs/' + mask_img
+    produce_wordcloud(text, cwpath + 'GUI_IMG_CACHE/' + 'nicewordcloud', mask_path)  # create and save an image of the new wordcloud
